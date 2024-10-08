@@ -11,7 +11,7 @@ import SwiftUI
 struct AppTaskCombineImagesApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainViewApp()
         }
     }
 }
