@@ -9,14 +9,14 @@ struct ImageAndId:View,Identifiable {
             Image(nameImage)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .clipShape(RoundedRectangle(cornerRadius:10,style:.continuous))
                 .frame(width:100,height: 100)
+                .clipShape(RoundedRectangle(cornerRadius:10,style:.continuous))
                 .overlay(alignment: .topTrailing) {
             Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 25,height: 25)
-                .foregroundStyle(isSelectedByUser ? .white:.clear)
+                .foregroundStyle(isSelectedByUser ? .blue:.clear)
                 .offset(x:-6, y:-8)
             
             
