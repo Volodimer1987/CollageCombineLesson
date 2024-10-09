@@ -5,9 +5,12 @@ import UIKit
 
 
 class ViewModel:ObservableObject {
+    let imageSaverToPhone = ImageSaver()
+    
     @Published var selectedImagesFromSheet = CurrentValueSubject<[ImageAndId],Never>([])
     @Published var countSelectedImagesFromSheet:Int = 0
     @Published var collageReadyImage:UIImage? = nil
+    
     private var subscriptions = Set<AnyCancellable>()
 
     func createSubscription()  {
@@ -22,6 +25,11 @@ class ViewModel:ObservableObject {
                 UIImage.collage(images: arrayImages, size: CGSize(width: 250, height: 250))
             })
             .assign(to: &$collageReadyImage)
+    }
+    
+    func saveImageFromImageSever() {
+        guard let image = collageReadyImage else { return }
+        imageSaverToPhone.writeToPhotoAlbum(image: image)
     }
 }
 

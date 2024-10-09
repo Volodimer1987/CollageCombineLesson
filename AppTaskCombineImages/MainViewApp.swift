@@ -45,7 +45,7 @@ struct MainViewApp: View {
                     }
                     
                     Button {
-                        print("save image")
+                        vm.saveImageFromImageSever()
                     } label: {
                         Text("Save")
                             .foregroundStyle(.white)
