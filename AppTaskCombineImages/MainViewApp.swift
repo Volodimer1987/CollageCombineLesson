@@ -9,23 +9,33 @@ import SwiftUI
 
 struct MainViewApp: View {
     
-    @State private var vm:ViewModel = ViewModel()
+    @StateObject  var vm:ViewModel = ViewModel()
     @State private var showSheet:Bool = false
     
     var body: some View {
         NavigationView(content: {
             VStack(alignment:.center) {
                 if let collageImage = vm.collageReadyImage {
-                    collageImage
+                    Image(uiImage:collageImage)
                         .ifHaveCollage()
                 } else {
-                    Image("checkImage")
-                        .ifHaveCollage()
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth:.infinity,maxHeight: 250,alignment: .center)
+                        .clipShape(RoundedRectangle(
+                        cornerRadius: 10, style: .continuous) )
+                        .padding(.all,10)
+                        .padding(.bottom,15)
                 }
                 
                 VStack(spacing:20) {
                     Button {
-                        print("add image")
+                withAnimation(.default) {
+                        vm.collageReadyImage = nil
+                            vm.countSelectedImagesFromSheet = 0
+
+                        }
                     } label: {
                         Text("Clear")
                             .foregroundStyle(.blue)
@@ -60,7 +70,12 @@ struct MainViewApp: View {
                     Spacer()
                     
                     Button {
+                        vm.createSubscription()
                         showSheet.toggle()
+
+                         if vm.selectedImagesFromSheet.value.count > 0 {
+                                 vm.selectedImagesFromSheet.value = []
+                          }
                     } label: {
                         Image(systemName: "plus")
                             .resizable()
@@ -75,8 +90,9 @@ struct MainViewApp: View {
                 SheetWithGreed()
             }
         })
+        .environmentObject(vm)
     }
-}
+} 
 
 
 

@@ -3,8 +3,9 @@ import SwiftUI
 struct ImageAndId:View,Identifiable {
     let id = UUID.init().uuidString
     let nameImage:String
-    @State private var isSelectedByUser = false
-    
+    @State var isSelectedByUser = false
+    @EnvironmentObject var viewModel: ViewModel
+
     var body: some View {
             Image(nameImage)
                 .resizable()
@@ -26,10 +27,21 @@ struct ImageAndId:View,Identifiable {
                 isSelectedByUser.toggle()
             }
         }
+        .onChange(of: isSelectedByUser) { oldValue, newValue in
+            if newValue == true {
+                 viewModel.countSelectedImagesFromSheet += 1
+                 viewModel.selectedImagesFromSheet.value.append(ImageAndId(nameImage: self.nameImage))
+            } else if newValue == false {
+                viewModel.countSelectedImagesFromSheet -= 1
+                viewModel.selectedImagesFromSheet.value.removeAll { image in
+                    image.nameImage == self.nameImage
+                }
+            }
+        }
 
     }
 }
 
 #Preview {
-    ImageAndId(nameImage:"image 1")
+    ImageAndId(nameImage:"image 1").environmentObject(ViewModel())
 }

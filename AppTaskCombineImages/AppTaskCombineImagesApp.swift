@@ -12,6 +12,8 @@ struct AppTaskCombineImagesApp: App {
     var body: some Scene {
         WindowGroup {
             MainViewApp()
+                .preferredColorScheme(.light)
+
         }
     }
 }

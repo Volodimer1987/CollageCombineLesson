@@ -3,19 +3,23 @@ import SwiftUI
 
 struct SheetWithGreed:View {
     @Environment(\.dismiss) private var dismiss
+    @State private var imagesAndId:[ImageAndId] = []
+    @EnvironmentObject var viewModel: ViewModel
+    
+    
     private let colomns:[GridItem] = [
-        GridItem(.fixed(100)),
-        GridItem(.fixed(100)),
-        GridItem(.fixed(100)),
+        GridItem(.fixed(100),spacing: 20),
+        GridItem(.fixed(100),spacing: 20),
+        GridItem(.fixed(100),spacing: 20),
     ]
+    
     var body: some View {
         NavigationView {
             VStack {
                 photosUpper
-                
                 LazyVGrid(columns:colomns,spacing:19) {
-                    ForEach(imagesNames,id: \.self) { imageName in
-                        imageToGrig(imageName: imageName)
+                    ForEach(imagesAndId,id: \.id) { id in
+                        id
                     }
                 }
                 .frame(maxHeight:.infinity,alignment: .top)
@@ -30,12 +34,26 @@ struct SheetWithGreed:View {
                     }
                 }
             }
+            
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                viewModel.collageReadyImage = nil
+
+            })
+            viewModel.countSelectedImagesFromSheet = 0
+        }
+//        .onDisappear {
+//            viewModel 
+//        }
+        .task(priority: .userInitiated) {
+            await imagesAndId = imageToGrig(imageName: imagesNames)
         }
     }
 }
 
 #Preview {
-    SheetWithGreed()
+    SheetWithGreed().environmentObject(ViewModel())
 }
 
 extension SheetWithGreed {
@@ -44,9 +62,14 @@ extension SheetWithGreed {
         "image 5" , "image 6" , "image 7"
     ]}
     
-    @ViewBuilder
-    func imageToGrig(imageName:String)  -> some View {
-            ImageAndId(nameImage: imageName)
+    
+    func imageToGrig(imageName:[String]) async -> [ImageAndId]{
+        var arrayOfImageAndId:[ImageAndId] = []
+        for  imageName in imagesNames {
+            let image =  ImageAndId(nameImage: imageName)
+            arrayOfImageAndId.append(image)
+        }
+        return arrayOfImageAndId
     }
 }
 
@@ -61,3 +84,21 @@ fileprivate var photosUpper:some View {
     .padding(.horizontal,15)
     .padding(.top,20)
 }
+
+extension SheetWithGreed  {
+    func sendSelectedImages() -> Image? {
+        var image:Image?
+        for value in imagesAndId {
+            if value.isSelectedByUser {
+                print(value.nameImage + "was tapped")
+                image = Image(value.nameImage)
+                return  image
+            } else {
+                continue
+            }
+        }
+        Thread.sleep(forTimeInterval: 1.0)
+        return Image("image 7")
+    }
+}
+
