@@ -30,22 +30,15 @@ struct SheetWithGreed:View {
                         } label: {
                             Text("Close").fontWeight(.bold)
                         }
-                        
                     }
                 }
             }
             
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                viewModel.collageReadyImage = nil
-
-            })
+            viewModel.collageReadyImage = nil
             viewModel.countSelectedImagesFromSheet = 0
         }
-//        .onDisappear {
-//            viewModel 
-//        }
         .task(priority: .userInitiated) {
             await imagesAndId = imageToGrig(imageName: imagesNames)
         }

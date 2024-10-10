@@ -23,9 +23,7 @@ struct ImageAndId:View,Identifiable {
             
         }
         .onTapGesture {
-            withAnimation(.bouncy) {
                 isSelectedByUser.toggle()
-            }
         }
         .onChange(of: isSelectedByUser) { oldValue, newValue in
             if newValue == true {

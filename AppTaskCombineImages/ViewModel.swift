@@ -11,25 +11,44 @@ class ViewModel:ObservableObject {
     @Published var countSelectedImagesFromSheet:Int = 0
     @Published var collageReadyImage:UIImage? = nil
     
-    private var subscriptions = Set<AnyCancellable>()
+    private var  cancellable: AnyCancellable?
 
     func createSubscription()  {
-        selectedImagesFromSheet
+    cancellable =  selectedImagesFromSheet
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.main)
             .map { imageS in
                 let imagesWithOut = imageS.compactMap { imageName in
                     return UIImage(named: imageName.nameImage)
                 }
                 return imagesWithOut
             }
-            .map({ arrayImages in
-                UIImage.collage(images: arrayImages, size: CGSize(width: 250, height: 250))
-            })
-            .assign(to: &$collageReadyImage)
+            .map { arrayImages in
+                var returnUIMage:UIImage? = UIImage()
+                if arrayImages.count == 0 {
+                    returnUIMage = nil
+                } else if arrayImages.count == 1 {
+                    print("одна картинка")
+                    if let image = arrayImages.first {
+                        returnUIMage = image
+                    } else {
+                        returnUIMage = arrayImages.first
+                    }
+                } else {
+                    returnUIMage = UIImage.collage(images: arrayImages, size: CGSize(width: 250, height: 250))
+                }
+                return returnUIMage
+            }
+            .assign(to: \.collageReadyImage, on: self)
     }
     
     func saveImageFromImageSever() {
         guard let image = collageReadyImage else { return }
         imageSaverToPhone.writeToPhotoAlbum(image: image)
+    }
+    
+    func cancelSubscription() {
+        cancellable?.cancel()
     }
 }
 
