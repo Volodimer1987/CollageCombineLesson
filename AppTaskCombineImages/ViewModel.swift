@@ -17,18 +17,17 @@ class ViewModel:ObservableObject {
     cancellable =  selectedImagesFromSheet
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.main)
-            .map { imageS in
+            .map {  imageS in
                 let imagesWithOut = imageS.compactMap { imageName in
                     return UIImage(named: imageName.nameImage)
                 }
                 return imagesWithOut
             }
-            .map { arrayImages in
+            .map {  arrayImages in
                 var returnUIMage:UIImage? = UIImage()
                 if arrayImages.count == 0 {
                     returnUIMage = nil
                 } else if arrayImages.count == 1 {
-                    print("одна картинка")
                     if let image = arrayImages.first {
                         returnUIMage = image
                     } else {
@@ -49,6 +48,9 @@ class ViewModel:ObservableObject {
     
     func cancelSubscription() {
         cancellable?.cancel()
+    }
+    deinit {
+        print("class was deinit")
     }
 }
 

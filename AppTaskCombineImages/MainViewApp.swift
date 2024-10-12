@@ -33,8 +33,8 @@ struct MainViewApp: View {
                     Button {
                 withAnimation(.default) {
                         vm.collageReadyImage = nil
-                            vm.countSelectedImagesFromSheet = 0
-
+                        vm.countSelectedImagesFromSheet = 0
+                        vm.selectedImagesFromSheet.send([])
                         }
                     } label: {
                         Text("Clear")
@@ -54,13 +54,14 @@ struct MainViewApp: View {
                     }
                     .frame(maxWidth:.infinity,maxHeight: 40)
                     
+                    
                 }
+                .disabled(vm.selectedImagesFromSheet.value.count == 0)
                 .fontWeight(.bold)
                 .font(.headline)
                 .padding(.horizontal,10)
                 
             }
-            
             .overlay(alignment: .top) {
                 HStack(spacing:100) {
                     Text("\(vm.countSelectedImagesFromSheet) photos")
@@ -90,6 +91,10 @@ struct MainViewApp: View {
                 SheetWithGreed()
             }
         })
+        .onDisappear {
+            vm.cancelSubscription()
+        }
+
         .environmentObject(vm)
     }
 } 
