@@ -10,11 +10,12 @@ class ViewModel:ObservableObject {
     @Published var selectedImagesFromSheet = CurrentValueSubject<[ImageAndId],Never>([])
     @Published var countSelectedImagesFromSheet:Int = 0
     @Published var collageReadyImage:UIImage? = nil
+    @Published var lastSavedPhotoIdOrError:String? = nil
     
-    private var  cancellable: AnyCancellable?
+    private var  cancellable:[String:AnyCancellable?] = [:]
 
     func createSubscription()  {
-    cancellable =  selectedImagesFromSheet
+        cancellable["selectedImagesFromSheet"] =  selectedImagesFromSheet
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.main)
             .map {  imageS in
@@ -46,11 +47,25 @@ class ViewModel:ObservableObject {
         imageSaverToPhone.writeToPhotoAlbum(image: image)
     }
     
-    func cancelSubscription() {
-        cancellable?.cancel()
+    func cancelSubscription(nameOfSubscription:String) {
+        cancellable[nameOfSubscription] = nil
     }
-    deinit {
-        print("class was deinit")
+   
+    func createSubscriptionOnSavedImage() {
+        guard let image = collageReadyImage else { return }
+        
+        cancellable["return future"] =  ImageSaver.isSavedImageAndReturnFuture(image: image)
+            .sink { [unowned self] complitionBack in
+                if case .failure(let error) = complitionBack {
+                    lastSavedPhotoIdOrError = error.localizedDescription
+                }
+            } receiveValue: { [unowned self] backValue in
+                lastSavedPhotoIdOrError = "Saved photo with id \(backValue)"
+            }
+    }
+    
+    func clearMessagesAfterTrySaveImage() {
+        lastSavedPhotoIdOrError = nil
     }
 }
 

@@ -11,6 +11,7 @@ struct MainViewApp: View {
     
     @StateObject  var vm:ViewModel = ViewModel()
     @State private var showSheet:Bool = false
+    @State private var showAlertIsSavedImage:Bool = false
     
     var body: some View {
         NavigationView(content: {
@@ -35,6 +36,7 @@ struct MainViewApp: View {
                         vm.collageReadyImage = nil
                         vm.countSelectedImagesFromSheet = 0
                         vm.selectedImagesFromSheet.send([])
+                        vm.cancelSubscription(nameOfSubscription:"return future")
                         }
                     } label: {
                         Text("Clear")
@@ -45,7 +47,8 @@ struct MainViewApp: View {
                     }
                     
                     Button {
-                        vm.saveImageFromImageSever()
+                        vm.createSubscriptionOnSavedImage()
+                        vm.cancelSubscription(nameOfSubscription:"return future")
                     } label: {
                         Text("Save")
                             .foregroundStyle(.white)
@@ -90,9 +93,17 @@ struct MainViewApp: View {
             .sheet(isPresented: $showSheet) {
                 SheetWithGreed()
             }
+            .alert(isPresented: $showAlertIsSavedImage) {
+                Alert(title:Text("\(vm.lastSavedPhotoIdOrError ?? " ")"), dismissButton: .cancel())
+            }
+        })
+        .onChange(of: vm.lastSavedPhotoIdOrError, { oldValue, newValue in
+            if oldValue != newValue {
+                showAlertIsSavedImage.toggle()
+            }
         })
         .onDisappear {
-            vm.cancelSubscription()
+            vm.cancelSubscription(nameOfSubscription:"selectedImagesFromSheet")
         }
 
         .environmentObject(vm)
