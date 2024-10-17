@@ -67,6 +67,8 @@ class ViewModel:ObservableObject {
     func clearMessagesAfterTrySaveImage() {
         lastSavedPhotoIdOrError = nil
     }
+    
+   
 }
 
 extension UIImage {

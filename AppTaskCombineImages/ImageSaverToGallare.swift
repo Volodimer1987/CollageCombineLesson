@@ -25,6 +25,10 @@ class ImageSaver: NSObject {
             }
         }
     }
+    
+    deinit {
+        print("class was deinit ")
+    }
 }
 
 extension ImageSaver {

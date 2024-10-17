@@ -6,7 +6,6 @@ struct SheetWithGreed:View {
     @State private var imagesAndId:[ImageAndId] = []
     @EnvironmentObject var viewModel: ViewModel
     
-    
     private let colomns:[GridItem] = [
         GridItem(.fixed(100),spacing: 20),
         GridItem(.fixed(100),spacing: 20),
@@ -34,6 +33,13 @@ struct SheetWithGreed:View {
                 }
             }
             
+        }
+
+        .onDisappear() {
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.3, execute: {
+                imagesAndId = []
+                print("images was deleted")
+            })
         }
         .onAppear {
             viewModel.collageReadyImage = nil
